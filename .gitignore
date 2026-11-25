@@ -221,3 +221,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# MLflow (local tracking store and artifacts; never commit)
+mlflow.db
+mlruns/
+mlartifacts/
