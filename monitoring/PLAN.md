@@ -5,3 +5,4 @@
 - **Output:** metrics are written to a Postgres table (`drift_metrics`) that Grafana reads; drift above a threshold raises an alert / retraining trigger.
 - **Tools:** Python, requests (or Locust), Evidently, PostgreSQL, pytest.
 - **Tests:** injected drift is flagged; normal traffic is not.
+- **Ground truth:** the simulator also writes the true `is_canceled` for each request into a `ground_truth` table keyed by `booking_id` (which the API also stores), so Evidently can join labels to predictions and compute model performance, not just data drift.
