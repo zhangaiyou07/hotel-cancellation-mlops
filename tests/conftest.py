@@ -1,8 +1,10 @@
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+import api.main as main
 from api.main import app, get_model
 from api.model import LoadedModel
+from api.store import PredictionStore
 from src.features import TARGET, basic_clean, load_raw, make_pipeline
 
 # One valid booking that all API tests can reuse
@@ -39,3 +41,11 @@ def small_model(sample_df):
     app.dependency_overrides[get_model] = lambda: model
     yield model
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def prediction_store(tmp_path, monkeypatch):
+    """Every test writes predictions to its own throw-away SQLite file instead of the real database."""
+    store = PredictionStore(f"sqlite:///{tmp_path / 'predictions.db'}")
+    monkeypatch.setattr(main, "get_store", lambda: store)
+    return store

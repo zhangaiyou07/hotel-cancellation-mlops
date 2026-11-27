@@ -227,3 +227,4 @@ mlflow.db
 mlruns/
 mlartifacts/
 .DS_Store
+predictions.db

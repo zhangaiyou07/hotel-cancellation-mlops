@@ -27,6 +27,12 @@ CANCEL_PROBABILITY = Histogram(
     buckets=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
 )
 
+# Predictions that could not be saved to the database (the user still gets the prediction)
+PREDICTION_LOG_ERRORS = Counter(
+    "prediction_log_errors",
+    "Predictions that could not be written to the database",
+)
+
 # Only these paths get their own label; anything else is grouped as "other"
 # (so random URLs cannot create thousands of different time series)
 KNOWN_ENDPOINTS = {"/predict", "/health"}
