@@ -2,37 +2,19 @@
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
-from sklearn.linear_model import LogisticRegression
 
 import api.main as main
 from api.main import app, get_model, risk_level
-from api.model import LoadedModel, booking_to_frame
+from api.model import booking_to_frame
 from api.schemas import BookingRequest
-from src.features import TARGET, make_pipeline
+from tests.conftest import VALID_BOOKING
 
 client = TestClient(app)
 
-VALID_BOOKING = {
-    "booking_id": "test-001",
-    "hotel": "City Hotel",
-    "arrival_date": "2017-06-10",
-    "lead_time": 120,
-    "adr": 95.5,
-    "deposit_type": "No Deposit",
-    "market_segment": "Online TA",
-}
 
-
-@pytest.fixture(scope="module", autouse=True)
-def small_model(sample_df):
-    """A small model trained on a data sample, used instead of the MLflow champion in tests
-    (CI has no MLflow server). It goes through exactly the same preprocessing pipeline."""
-    X, y = sample_df.drop(columns=[TARGET]), sample_df[TARGET]
-    pipeline = make_pipeline(LogisticRegression(max_iter=2000), kind="onehot").fit(X, y)
-    model = LoadedModel(pipeline=pipeline, version="test")
-    app.dependency_overrides[get_model] = lambda: model
-    yield model
-    app.dependency_overrides.clear()
+@pytest.fixture(autouse=True)
+def _use_small_model(small_model):
+    """Every test in this file uses the small test model (defined in conftest.py)."""
 
 
 def test_health():
