@@ -23,3 +23,41 @@ jobs:
 
       - name: Unit tests (pytest)
         run: pytest -v
+
+  integration:
+    # Trains the real model, builds the API image, starts the container and sends real HTTP requests
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Train and register a champion model
+        run: python -m src.train
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///${{ github.workspace }}/mlflow.db
+
+      - name: Build the API image
+        run: docker build -f api/Dockerfile -t hotel-api .
+
+      - name: Start the API container
+        run: |
+          docker run -d --name api -p 8000:8000 --user "$(id -u):$(id -g)" \
+            -v "$PWD:$PWD" -e MLFLOW_TRACKING_URI="sqlite:///$PWD/mlflow.db" hotel-api
+          for i in $(seq 1 30); do curl -sf http://localhost:8000/health && break; sleep 2; done
+
+      - name: Integration test
+        run: pytest -v tests/integration
+        env:
+          API_URL: http://localhost:8000
+
+      - name: Show container logs if something failed
+        if: failure()
+        run: docker logs api

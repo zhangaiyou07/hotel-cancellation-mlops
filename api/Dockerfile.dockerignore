@@ -1,0 +1,18 @@
+# Files Docker does not copy when building the API image (keeps it small and free of secrets)
+.git
+.github
+.env
+data/
+docs/
+mlruns/
+mlartifacts/
+mlflow.db
+predictions.db
+tests/
+frontend/
+monitoring/
+infra/
+training/
+**/__pycache__
+.pytest_cache
+.ruff_cache
