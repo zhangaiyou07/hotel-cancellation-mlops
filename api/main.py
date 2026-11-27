@@ -22,7 +22,7 @@ from api.store import PredictionStore
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Hotel Cancellation Model API", version="0.4.0")
+app = FastAPI(title="Hotel Cancellation Model API", version="0.5.0")
 
 
 @app.middleware("http")
@@ -82,6 +82,15 @@ def save_prediction(booking: BookingRequest, booking_id: str, probability: float
         logger.exception("Could not save prediction %s", booking_id)
 
 
+def explain_prediction(model: LoadedModel, booking: BookingRequest) -> list[dict]:
+    """Top factors for the frontend. A problem with the explanation never blocks the prediction."""
+    try:
+        return model.explain(booking)
+    except Exception:
+        logger.exception("Could not explain prediction")
+        return []
+
+
 @app.get("/health")
 def health() -> dict:
     """Lets docker-compose and the tests check that the service is running."""
@@ -111,4 +120,5 @@ def predict(
         cancel_probability=probability,
         risk_level=level,
         model_version=model.version,
+        top_factors=explain_prediction(model, booking),
     )

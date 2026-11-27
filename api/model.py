@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from api.explain import top_factors
 from api.schemas import BookingRequest
 
 MODEL_NAME = os.getenv("MODEL_NAME", "hotel-cancellation-model")
@@ -39,6 +40,10 @@ class LoadedModel:
 
     def predict_proba(self, booking: BookingRequest) -> float:
         return float(self.pipeline.predict_proba(booking_to_frame(booking))[0, 1])
+
+    def explain(self, booking: BookingRequest) -> list[dict]:
+        """The features that pushed this booking's probability up or down the most."""
+        return top_factors(self.pipeline, booking_to_frame(booking))
 
 
 def load_champion() -> LoadedModel:

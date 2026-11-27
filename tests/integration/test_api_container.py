@@ -34,6 +34,7 @@ def test_real_model_returns_a_prediction(api):
     assert 0 <= body["cancel_probability"] <= 1
     assert body["risk_level"] in {"low", "medium", "high"}
     assert body["model_version"].isdigit()  # a real registered model version, not the test model
+    assert body["top_factors"], "the champion model should be explainable"
 
 
 def test_container_rejects_bad_input(api):

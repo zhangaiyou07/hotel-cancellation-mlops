@@ -48,8 +48,15 @@ class BookingRequest(BaseModel):
     company: int | None = Field(default=None, ge=0, description="Company id, empty if none")
 
 
+class TopFactor(BaseModel):
+    feature: str
+    value: str | int | float | None  # the booking's value for this feature
+    impact: float  # > 0 pushes towards cancellation, < 0 towards a kept booking (log-odds)
+
+
 class PredictionResponse(BaseModel):
     booking_id: str | None
     cancel_probability: float = Field(ge=0, le=1)
     risk_level: Literal["low", "medium", "high"]
     model_version: str
+    top_factors: list[TopFactor] = Field(default_factory=list)  # empty if the model cannot be explained
