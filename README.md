@@ -123,6 +123,12 @@ Every training run is logged to MLflow with its parameters and metrics, evaluate
 | xgboost_deep | 0.851 | 0.802 |
 | **xgboost_shallow** (registered) | **0.852** | **0.803** |
 
+**Why `xgboost_shallow`?** `src/train.py` registers the run with the highest test ROC-AUC. The two XGBoost
+models are within 0.002 of each other, which is within noise; the shallow one is also simpler (300 trees of
+depth 4 vs. 500 of depth 8), so it is faster to serve and less likely to overfit.
+*Known limitation:* selecting the model on the test set leaks a little information. The Prefect training
+pipeline will select on cross-validation within the training data and keep the test set for final evaluation.
+
 ![MLflow runs](docs/images/mlflow_runs.png)
 
 The best run is registered in the MLflow Model Registry as `hotel-cancellation-model`. The `@champion`
