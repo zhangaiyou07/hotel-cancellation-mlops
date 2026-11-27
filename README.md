@@ -7,13 +7,13 @@ API + frontend, and monitoring for drift.
 
 **Team:** Group 8
 
-| Member | GitHub | Responsibility (feature branch) |
-|---|---|---|
-| Zijia Zhang | [@zhangaiyou07](https://github.com/zhangaiyou07) | TBD |
-| Zhou Mo | [@MoZhou-vicky](https://github.com/MoZhou-vicky) | TBD |
-| Yang Cassie | [@cass1eoo](https://github.com/cass1eoo) | TBD |
-| Liu Zexi | [@zexisui](https://github.com/zexisui) | TBD |
-| Liu Siyu | [@Siyu-Liu123](https://github.com/Siyu-Liu123) | TBD |
+| Member | GitHub | Responsibility | Feature branch |
+|---|---|---|---|
+| Zijia Zhang | [@zhangaiyou07](https://github.com/zhangaiyou07) | Dashboards & alerts (Prometheus, Grafana), CD to GHCR, docker-compose integration | `feature/dashboards-cicd` |
+| Zexi Liu | [@zexisui](https://github.com/zexisui) | Training pipeline (Prefect), MLflow server, hyperparameter tuning, retraining | `feature/training-pipeline` |
+| Cassie Yang | [@cass1eoo](https://github.com/cass1eoo) | Monitoring: traffic simulator, drift injection, Evidently, prediction store | `feature/monitoring` |
+| Mo Zhou | [@MoZhou-vicky](https://github.com/MoZhou-vicky) | Model API (FastAPI), input validation, `/metrics`, integration test | `feature/model-api` |
+| Siyu Liu | [@Siyu-Liu123](https://github.com/Siyu-Liu123) | Frontend, explainability (SHAP), final presentation | `feature/frontend` |
 
 ---
 
