@@ -1,9 +1,27 @@
 """Model API: receives one hotel booking and returns the probability that it will be cancelled."""
-from fastapi import FastAPI
+from functools import lru_cache
+from typing import Annotated
 
+from fastapi import Depends, FastAPI, HTTPException
+
+from api.model import LoadedModel, load_champion
 from api.schemas import BookingRequest, PredictionResponse
 
-app = FastAPI(title="Hotel Cancellation Model API", version="0.1.0")
+app = FastAPI(title="Hotel Cancellation Model API", version="0.2.0")
+
+
+@lru_cache(maxsize=1)
+def _cached_model() -> LoadedModel:
+    return load_champion()
+
+
+def get_model() -> LoadedModel:
+    """Load the champion model on the first request and reuse it afterwards."""
+    try:
+        return _cached_model()
+    except Exception as exc:
+        # e.g. MLflow is not reachable or no model is registered yet: answer clearly instead of crashing
+        raise HTTPException(status_code=503, detail=f"Model not available: {exc}") from exc
 
 
 def risk_level(probability: float) -> str:
@@ -22,13 +40,15 @@ def health() -> dict:
 
 
 @app.post("/predict", response_model=PredictionResponse)
-def predict(booking: BookingRequest) -> PredictionResponse:
-    """Predict the cancellation probability of one booking."""
-    # TEMPORARY: a fixed value until we load the real model from MLflow (next step)
-    probability = 0.5
+def predict(
+    booking: BookingRequest,
+    model: Annotated[LoadedModel, Depends(get_model)],
+) -> PredictionResponse:
+    """Predict the cancellation probability of one booking with the champion model."""
+    probability = model.predict_proba(booking)
     return PredictionResponse(
         booking_id=booking.booking_id,
-        cancel_probability=probability,
+        cancel_probability=round(probability, 4),
         risk_level=risk_level(probability),
-        model_version="placeholder",
+        model_version=model.version,
     )
